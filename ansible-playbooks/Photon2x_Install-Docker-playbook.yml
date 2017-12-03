@@ -2,7 +2,7 @@
 
 ################################################################################
 #  description: Installs Docker on Photon2x
-#  usage: ansible-playbook Photon2x_Install-Docker-playbook.yml --extra-vars 'HostOrGroup=Photon'
+#  usage: ansible-playbook Photon2x_Install-Docker-playbook.yml --extra-vars 'HostOrGroup=photon'
 #  author: Ernest G. Wilson II <ErnestGWilsonII@gmail.com> (https://github.com/ernestgwilsonii)
 #  license: MIT
 ################################################################################
@@ -13,7 +13,7 @@
 #####################################################
 
 - name: Install Docker on Photon2x
-  hosts: "{{ HostOrGroup|default ('Photon') }}"
+  hosts: "{{ HostOrGroup|default ('photon') }}"
   serial: "100%"
   gather_facts: False
   tasks:

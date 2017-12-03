@@ -1,7 +1,7 @@
 [CentOS7]
 localhost ansible_host=127.0.0.1
 
-[Photon]
+[photon]
 photon01 ansible_host=172.28.0.101
 photon02 ansible_host=172.28.0.102
 photon03 ansible_host=172.28.0.103

@@ -1,0 +1,4 @@
+ansible_ssh_user: "root"
+ansible_ssh_pass: "M1n1m@l!"
+ansible_ssh_port: "22"
+ansible_connection: "ssh"
