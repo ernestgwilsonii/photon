@@ -12,6 +12,6 @@ services:
     stop_signal: SIGRTMIN+3
     ports:
     - "2222:22"
-    container_name: centos7-systemd-sshd
+    container_name: centos7-systemd-sshd-ansible
     command: /usr/sbin/init
 

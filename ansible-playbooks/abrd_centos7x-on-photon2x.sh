@@ -4,7 +4,7 @@
 # Ansible Bootstrap Rapid Deployment for CentOS7x in Docker on Photon2x                                                            #
 #                                                                                                                                  #
 # CentOS7x Usage:                                                                                                                  #
-#   curl https://raw.githubusercontent.com/ernestgwilsonii/photon/ansible-playbooks/master/abrd_centos7x-on-photon2x.sh | bash -   #
+#   curl https://raw.githubusercontent.com/ernestgwilsonii/photon/master/ansible-playbooks/abrd_centos7x-on-photon2x.sh | bash -   #
 #                                                                                                                                  #
 #                                                                                             ErnestGWilsonII@gmail.com 2017-12-03 #
 #                                                                                               https://github.com/ernestgwilsonii #
@@ -61,12 +61,12 @@ echo "photon01 ansible_host=172.28.0.101" >> /etc/ansible/hosts
 echo "photon02 ansible_host=172.28.0.102" >> /etc/ansible/hosts
 echo "photon03 ansible_host=172.28.0.103" >> /etc/ansible/hosts
 cd /etc/ansible
-wget https://raw.githubusercontent.com/ernestgwilsonii/photon/ansible-playbooks/master/Photon2x_Apply-OS-Updates-playbook.yml
-wget https://raw.githubusercontent.com/ernestgwilsonii/photon/ansible-playbooks/master/Photon2x_Install-Docker-playbook.yml
+wget https://raw.githubusercontent.com/ernestgwilsonii/photon/master/ansible-playbooks/Photon2x_Apply-OS-Updates-playbook.yml
+wget https://raw.githubusercontent.com/ernestgwilsonii/photon/master/ansible-playbooks/Photon2x_Install-Docker-playbook.yml
 mkdir -p /etc/ansible/files/Photon2x/Docker
 cd /etc/ansible/files/Photon2x/Docker
-wget https://raw.githubusercontent.com/ernestgwilsonii/photon/ansible-playbooks/master/files/Photon2x/Docker/docker.service
-wget https://raw.githubusercontent.com/ernestgwilsonii/photon/ansible-playbooks/master/files/Photon2x/Docker/docker.socket
+wget https://raw.githubusercontent.com/ernestgwilsonii/photon/master/ansible-playbooks/files/Photon2x/Docker/docker.service
+wget https://raw.githubusercontent.com/ernestgwilsonii/photon/master/ansible-playbooks/files/Photon2x/Docker/docker.socket
 cd /etc/ansible
 
 # Create a default starting /etc/ansible/ansible.cfg
