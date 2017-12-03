@@ -15,7 +15,7 @@ sed -ri 's/^PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config;\
 sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config;\
 echo 'root:root' |chpasswd;
 
-RUN curl https://raw.githubusercontent.com/ernestgwilsonii/ansible/master/abrd_centos7x.sh | bash -
+RUN curl https://raw.githubusercontent.com/ernestgwilsonii/photon/ansible-playbooks/master/abrd_centos7x-on-photon2x.sh | bash -
 
 VOLUME [ "/sys/fs/cgroup" ]
 EXPOSE 22

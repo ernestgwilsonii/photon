@@ -1,0 +1,27 @@
+---
+
+################################################################################
+#  description: Installs/applies OS updates and patches on Photon2x
+#  usage: ansible-playbook CentOS7x_Apply-OS-Updates-playbook.yml --extra-vars 'HostOrGroup=Photon'
+#  author: Ernest G. Wilson II <ErnestGWilsonII@gmail.com> (https://github.com/ernestgwilsonii)
+#  license: MIT
+################################################################################
+
+
+# Ansible Playbook options
+# REF: http://docs.ansible.com/ansible/playbooks.html
+#####################################################
+
+- name: Apply OS updates and patches on CentOS7x
+  hosts: "{{ HostOrGroup|default ('Photon') }}"
+  serial: "100%"
+  gather_facts: False
+  tasks:
+
+
+# Execute command(s)
+# REF: http://docs.ansible.com/ansible/command_module.html
+##########################################################
+
+  - name: Apply all Photon OS updates
+    command: tdnf -y upgrade

@@ -1,0 +1,180 @@
+---
+
+################################################################################
+#  description: Installs Docker on Photon2x
+#  usage: ansible-playbook Photon2x_Install-Docker-playbook.yml --extra-vars 'HostOrGroup=Photon'
+#  author: Ernest G. Wilson II <ErnestGWilsonII@gmail.com> (https://github.com/ernestgwilsonii)
+#  license: MIT
+################################################################################
+
+
+# Ansible Playbook options
+# REF: http://docs.ansible.com/ansible/playbooks.html
+#####################################################
+
+- name: Install Docker on Photon2x
+  hosts: "{{ HostOrGroup|default ('Photon') }}"
+  serial: "100%"
+  gather_facts: False
+  tasks:
+
+
+# Use the copy module to copy various files into place
+# REF: http://docs.ansible.com/ansible/copy_module.html
+#######################################################
+
+# /etc/systemd/system/docker.service
+  - name: Copy files/Photon2x/Docker/docker.service to /etc/systemd/system/docker.service
+    copy:
+      src=files/Photon2x/Docker/docker.service
+      dest=/etc/systemd/system/docker.service
+      owner=root
+      group=root
+      mode=0444
+
+# /etc/systemd/system/docker.socket
+  - name: Copy files/Photon2x/Docker/docker.service to /etc/systemd/system/docker.service
+    copy:
+      src=files/Photon2x/Docker/docker.socket
+      dest=/etc/systemd/system/docker.socket
+      owner=root
+      group=root
+      mode=0444
+
+
+# Execute command(s)
+# REF: http://docs.ansible.com/ansible/command_module.html
+##########################################################
+
+  - name: Apply all Photon OS updates
+    command: tdnf -y upgrade
+
+  - name: Enable IPv4 Forwarding
+    command: sysctl -w net.ipv4.ip_forward=1
+
+  - name: Increase vm.max_map_count to 262144
+    command: sysctl -w vm.max_map_count=262144
+
+  - name: Remove existing Docker
+    command: tdnf erase -y docker
+
+  - name: Install tar
+    command: tdnf install -y tar
+
+  - name: Add docker group to OS
+    command: groupadd -r docker
+
+  - name: Clearing the Machine ID of a Cloned Instance
+    command: echo -n > /etc/machine-id
+
+  - name: tdnf -y install strace
+    command: tdnf -y install strace
+
+  - name: tdnf -y install pmd
+    command: tdnf -y install pmd
+
+  - name: systemctl enable pmd
+    command: systemctl enable pmd
+
+  - name: systemctl start pmd
+    command: systemctl start pmd
+
+  - name: tdnf -y install pmd-cli
+    command: tdnf -y install pmd-cli
+
+  - name: tdnf -y install nfs-utils
+    command: tdnf -y install nfs-utils
+
+  - name: tdnf -y install iptables
+    command: tdnf -y install iptables
+
+  - name: tdnf -y install lsof
+    command: tdnf -y install lsof
+
+  - name: tdnf -y install tcpdump
+    command: tdnf -y install tcpdump
+
+  - name: tdnf -y install traceroute
+    command: tdnf -y install traceroute
+
+  - name: tdnf -y install mc
+    command: tdnf -y install mc
+
+  - name: tdnf -y install gnutls
+    command: tdnf -y install gnutls
+
+  - name: tdnf -y install netcat
+    command: tdnf -y install netcat
+
+  - name: pmd-cli net ntp_servers --set --servers north-america.pool.ntp.org
+    command: pmd-cli net ntp_servers --set --servers north-america.pool.ntp.org
+
+  - name: tdnf -y install git
+    command: tdnf -y install git
+
+  - name: Backup the default iptables rule set
+    command: cp /etc/systemd/scripts/ip4save /etc/systemd/scripts/ip4save-DEFAULT
+
+  - name: Update the OS firewall to allow port TCP 2375 for incoming Docker Cloud connections
+    command: iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 2375 -j ACCEPT
+
+  - name: Update the OS firewall to allow port TCP 2376 for incoming docker-machine connections
+    command: iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 2376 -j ACCEPT
+
+  - name: Update the OS firewall to allow port TCP 2377 for incoming Docker cluster management connections
+    command: iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 2377 -j ACCEPT
+
+  - name: Update the OS firewall to allow port TCP 4789 for incoming Docker overlay network connections
+    command: iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 4789 -j ACCEPT
+
+  - name: Update the OS firewall to allow port UDP 4789 for incoming Docker overlay network connections
+    command: iptables -A INPUT -p udp -m state --state NEW -m udp --dport 4789 -j ACCEPT
+
+  - name: Update the OS firewall to allow port TCP 6783 for incoming Docker overlay network connections
+    command: iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 6783 -j ACCEPT
+
+  - name: Update the OS firewall to allow port UDP 6783 for incoming Docker overlay network connections
+    command: iptables -A INPUT -p udp -m state --state NEW -m udp --dport 6783 -j ACCEPT
+
+  - name: Update the OS firewall to allow port TCP 7946 for incoming Docker communication among nodes
+    command: iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 7946 -j ACCEPT
+
+  - name: Update the OS firewall to allow port UDP 7946 for incoming Docker communication among nodes
+    command: iptables -A INPUT -p udp -m state --state NEW -m udp --dport 7946 -j ACCEPT
+
+  - name: Update the OS firewall to allow ports TCP 30000-32767 for incoming Docker swarm manager PublishedPort connections
+    command: iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 30000:32767 -j ACCEPT
+
+
+# Execute raw command(s)
+# REF: http://docs.ansible.com/ansible/raw_module.html
+##########################################################
+
+#  - name: Install build essentials
+#    raw: curl -L https://git.io/v1boE | xargs -I {} tdnf install -y {}
+    # REF: https://github.com/vmware/photon/wiki/Frequently-Asked-Questions#q-how-to-install-all-build-essentials
+
+  - name: Save the updated iptables rules
+    raw: /usr/sbin/iptables-save > /etc/systemd/scripts/ip4save
+
+  - name: Install latest Docker! 
+    raw: curl -L'#' https://download.docker.com/linux/static/test/x86_64/docker-17.11.0-ce.tgz | tar --strip-components=1 -C /usr/bin -xzf -
+    # REF: https://download.docker.com/linux/static/test/x86_64/
+
+  - name: Install docker-compose
+    raw: curl -L https://github.com/docker/compose/releases/download/1.17.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+
+
+# Execute command(s)
+# REF: http://docs.ansible.com/ansible/command_module.html
+##########################################################
+
+  - name: chmod +x /usr/local/bin/docker-compose
+    command: chmod +x /usr/local/bin/docker-compose
+
+  - name: systemctl enable docker
+    command: systemctl enable docker
+
+  - name: reboot so Docker can start! Boom!
+    command: reboot
+
