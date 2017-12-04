@@ -1,0 +1,141 @@
+version: '3.4'
+
+services:
+
+  elasticsearch1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.0.0
+    environment:
+      - cluster.name=photon-docker-es-cluster1
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - type: bind
+        source: /opt/elasticsearch/data
+        target: /usr/share/elasticsearch/data
+    ports:
+      - mode: host
+        target: 9200
+        published: 9200
+    networks:
+      - photon-docker-es-esnet1
+    deploy:
+      labels:
+        local.description: "Elasticsearch Node part of photon-docker-es-cluster1"
+      placement:
+        constraints:
+          - node.labels.swarm.node == 1
+
+  elasticsearch2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.0.0
+    environment:
+      - cluster.name=photon-docker-es-cluster1
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.zen.ping.unicast.hosts=elasticsearch"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - type: bind
+        source: /opt/elasticsearch/data
+        target: /usr/share/elasticsearch/data
+    ports:
+      - mode: host
+        target: 9200
+        published: 9200
+    networks:
+      - photon-docker-es-esnet1
+    deploy:
+      labels:
+        local.description: "Elasticsearch Node 2 part of photon-docker-es-cluster1"
+      placement:
+        constraints:
+          - node.labels.swarm.node == 2
+
+  elasticsearch3:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.0.0
+    environment:
+      - cluster.name=photon-docker-es-cluster1
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.zen.ping.unicast.hosts=elasticsearch"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - type: bind
+        source: /opt/elasticsearch/data
+        target: /usr/share/elasticsearch/data
+    ports:
+      - mode: host
+        target: 9200
+        published: 9200
+    networks:
+      - photon-docker-es-esnet1
+    deploy:
+      labels:
+        local.description: "Elasticsearch Node 3 part of photon-docker-es-cluster1"
+      placement:
+        constraints:
+          - node.labels.swarm.node == 3
+
+  kibana1:
+    image: docker.elastic.co/kibana/kibana:6.0.0
+    environment:
+      SERVER_NAME: kibana1
+      ELASTICSEARCH_URL: http://elasticsearch1:9200
+    ports:
+      - mode: host
+        target: 5601
+        published: 5601
+    networks:
+      - photon-docker-es-esnet1
+    deploy:
+      labels:
+        local.description: "Kibana Node 1 part of photon-docker-es-cluster1"
+      placement:
+        constraints:
+          - node.labels.swarm.node == 1
+
+  kibana2:
+    image: docker.elastic.co/kibana/kibana:6.0.0
+    environment:
+      SERVER_NAME: kibana2
+      ELASTICSEARCH_URL: http://elasticsearch1:9200
+    ports:
+      - mode: host
+        target: 5601
+        published: 5601
+    networks:
+      - photon-docker-es-esnet1
+    deploy:
+      labels:
+        local.description: "Kibana Node 2 part of photon-docker-es-cluster1"
+      placement:
+        constraints:
+          - node.labels.swarm.node == 2
+
+  kibana3:
+    image: docker.elastic.co/kibana/kibana:6.0.0
+    environment:
+      SERVER_NAME: kibana3
+      ELASTICSEARCH_URL: http://elasticsearch1:9200
+    ports:
+      - mode: host
+        target: 5601
+        published: 5601
+    networks:
+      - photon-docker-es-esnet1
+    deploy:
+      labels:
+        local.description: "Kibana Node 3 part of photon-docker-es-cluster1"
+      placement:
+        constraints:
+          - node.labels.swarm.node == 3
+
+networks:
+  photon-docker-es-esnet1:
+
