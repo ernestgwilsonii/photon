@@ -1,0 +1,178 @@
+version: '3.4'
+
+services:
+
+  elasticsearch1:
+    image: docker.elastic.co/elasticsearch/elasticsearch-basic:6.0.0
+    environment:
+      - node.name=elk_elasticsearch1
+      - ELASTIC_PASSWORD=changeme
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - cluster.name=photon-docker-es-cluster1
+      - gateway.expected_nodes=3
+      - gateway.recover_after_time=1m
+    volumes:
+      - type: bind
+        source: /opt/elasticsearch/data
+        target: /usr/share/elasticsearch/data
+    ports:
+      - mode: host
+        target: 9200
+        published: 9200
+      - mode: host
+        target: 9300
+        published: 9300
+    networks:
+      - photon-docker-es-esnet1
+    deploy:
+      labels:
+        local.description: "Elasticsearch Node part of photon-docker-es-cluster1"
+      placement:
+        constraints:
+          - node.labels.swarm.node == 1
+
+  elasticsearch2:
+    image: docker.elastic.co/elasticsearch/elasticsearch-basic:6.0.0
+    environment:
+      - node.name=elk_elasticsearch2
+      - ELASTIC_PASSWORD=changeme
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - cluster.name=photon-docker-es-cluster1
+      - gateway.expected_nodes=3
+      - gateway.recover_after_time=1m
+      - "discovery.zen.ping.unicast.hosts=elk_elasticsearch1"
+    volumes:
+      - type: bind
+        source: /opt/elasticsearch/data
+        target: /usr/share/elasticsearch/data
+    ports:
+      - mode: host
+        target: 9200
+        published: 9200
+      - mode: host
+        target: 9300
+        published: 9300
+    networks:
+      - photon-docker-es-esnet1
+    deploy:
+      labels:
+        local.description: "Elasticsearch Node 2 part of photon-docker-es-cluster1"
+      placement:
+        constraints:
+          - node.labels.swarm.node == 2
+
+  elasticsearch3:
+    image: docker.elastic.co/logstash/logstash:6.0.1
+    environment:
+      - node.name=elk_elasticsearch3
+      - ELASTIC_PASSWORD=changeme
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - cluster.name=photon-docker-es-cluster1
+      - gateway.expected_nodes=3
+      - gateway.recover_after_time=1m
+      - "discovery.zen.ping.unicast.hosts=elk_elasticsearch1"
+    volumes:
+      - type: bind
+        source: /opt/elasticsearch/data
+        target: /usr/share/elasticsearch/data
+    ports:
+      - mode: host
+        target: 9200
+        published: 9200
+      - mode: host
+        target: 9300
+        published: 9300
+    networks:
+      - photon-docker-es-esnet1
+    deploy:
+      labels:
+        local.description: "Elasticsearch Node 3 part of photon-docker-es-cluster1"
+      placement:
+        constraints:
+          - node.labels.swarm.node == 3
+
+  kibana1:
+    image: docker.elastic.co/kibana/kibana-x-pack:6.0.0
+    environment:
+      SERVER_NAME: kibana1
+      ELASTICSEARCH_URL: http://elk_elasticsearch1:9200
+    ports:
+      - mode: host
+        target: 5601
+        published: 5601
+    networks:
+      - photon-docker-es-esnet1
+    deploy:
+      labels:
+        local.description: "Kibana Node 1 part of photon-docker-es-cluster1"
+      placement:
+        constraints:
+          - node.labels.swarm.node == 1
+
+  kibana2:
+    image: docker.elastic.co/kibana/kibana-x-pack:6.0.0
+    environment:
+      SERVER_NAME: kibana2
+      ELASTICSEARCH_URL: http://elk_elasticsearch2:9200
+    ports:
+      - mode: host
+        target: 5601
+        published: 5601
+    networks:
+      - photon-docker-es-esnet1
+    deploy:
+      labels:
+        local.description: "Kibana Node 2 part of photon-docker-es-cluster1"
+      placement:
+        constraints:
+          - node.labels.swarm.node == 2
+
+  kibana3:
+    image: docker.elastic.co/kibana/kibana-x-pack:6.0.0
+    environment:
+      SERVER_NAME: kibana3
+      ELASTICSEARCH_URL: http://elk_elasticsearch3:9200
+    ports:
+      - mode: host
+        target: 5601
+        published: 5601
+    networks:
+      - photon-docker-es-esnet1
+    deploy:
+      labels:
+        local.description: "Kibana Node 3 part of photon-docker-es-cluster1"
+      placement:
+        constraints:
+          - node.labels.swarm.node == 3
+
+  logstash1:
+    image: docker.elastic.co/logstash/logstash-x-pack:6.0.0
+    environment:
+      - SERVER_NAME=elk_logstash1
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - type: bind
+        source: /opt/logstash/config/logstash.yml
+        target: /usr/share/logstash/config/logstash.yml
+    ports:
+      - mode: host
+        target: 5000
+        published: 5000
+    ports:
+      - mode: host
+        target: 162
+        published: 162
+        protocol: udp
+    networks:
+      - photon-docker-es-esnet1
+    deploy:
+      labels:
+        local.description: "Logstash Node 1 part of photon-docker-es-cluster1"
+      placement:
+        constraints:
+          - node.labels.swarm.node == 1
+
+
+networks:
+  photon-docker-es-esnet1:
+

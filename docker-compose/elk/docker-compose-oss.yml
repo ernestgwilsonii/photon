@@ -3,14 +3,13 @@ version: '3.4'
 services:
 
   elasticsearch1:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.0.0
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.0.0
     environment:
-      - cluster.name=photon-docker-es-cluster1
+      - node.name=elk_elasticsearch1
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
+      - cluster.name=photon-docker-es-cluster1
+      - gateway.expected_nodes=3
+      - gateway.recover_after_time=3m
     volumes:
       - type: bind
         source: /opt/elasticsearch/data
@@ -19,6 +18,9 @@ services:
       - mode: host
         target: 9200
         published: 9200
+      - mode: host
+        target: 9300
+        published: 9300
     networks:
       - photon-docker-es-esnet1
     deploy:
@@ -29,15 +31,14 @@ services:
           - node.labels.swarm.node == 1
 
   elasticsearch2:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.0.0
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.0.0
     environment:
-      - cluster.name=photon-docker-es-cluster1
+      - node.name=elk_elasticsearch2
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "discovery.zen.ping.unicast.hosts=elasticsearch"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
+      - cluster.name=photon-docker-es-cluster1
+      - gateway.expected_nodes=3
+      - gateway.recover_after_time=3m
+      - "discovery.zen.ping.unicast.hosts=elk_elasticsearch1"
     volumes:
       - type: bind
         source: /opt/elasticsearch/data
@@ -46,6 +47,9 @@ services:
       - mode: host
         target: 9200
         published: 9200
+      - mode: host
+        target: 9300
+        published: 9300
     networks:
       - photon-docker-es-esnet1
     deploy:
@@ -56,15 +60,14 @@ services:
           - node.labels.swarm.node == 2
 
   elasticsearch3:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.0.0
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.0.0
     environment:
-      - cluster.name=photon-docker-es-cluster1
+      - node.name=elk_elasticsearch3
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "discovery.zen.ping.unicast.hosts=elasticsearch"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
+      - cluster.name=photon-docker-es-cluster1
+      - gateway.expected_nodes=3
+      - gateway.recover_after_time=3m
+      - "discovery.zen.ping.unicast.hosts=elk_elasticsearch1"
     volumes:
       - type: bind
         source: /opt/elasticsearch/data
@@ -73,6 +76,9 @@ services:
       - mode: host
         target: 9200
         published: 9200
+      - mode: host
+        target: 9300
+        published: 9300
     networks:
       - photon-docker-es-esnet1
     deploy:
@@ -83,7 +89,7 @@ services:
           - node.labels.swarm.node == 3
 
   kibana1:
-    image: docker.elastic.co/kibana/kibana:6.0.0
+    image: docker.elastic.co/kibana/kibana-oss:6.0.0
     environment:
       SERVER_NAME: kibana1
       ELASTICSEARCH_URL: http://elasticsearch1:9200
@@ -101,7 +107,7 @@ services:
           - node.labels.swarm.node == 1
 
   kibana2:
-    image: docker.elastic.co/kibana/kibana:6.0.0
+    image: docker.elastic.co/kibana/kibana-oss:6.0.0
     environment:
       SERVER_NAME: kibana2
       ELASTICSEARCH_URL: http://elasticsearch1:9200
@@ -119,7 +125,7 @@ services:
           - node.labels.swarm.node == 2
 
   kibana3:
-    image: docker.elastic.co/kibana/kibana:6.0.0
+    image: docker.elastic.co/kibana/kibana-oss:6.0.0
     environment:
       SERVER_NAME: kibana3
       ELASTICSEARCH_URL: http://elasticsearch1:9200
